@@ -1,0 +1,51 @@
+#!/bin/bash
+#volumancerd
+VERSION="1.0"
+trap 'if [ -n "$(jobs -p)" ]; then kill $(jobs -p); rm $socket; fi' EXIT
+printHelp () {
+	echo -e "volumancerd v$VERSION"\
+	"\nAuthor: Logan Dean"\
+	"\nUsage:"\
+	"\n$\tvolumancerd"\
+	"\nPassing any parameters displays this help."
+	exit 0
+}
+
+if [ $# != 0 ]; then
+  	printHelp
+fi
+socket=$(mktemp -u /var/tmp/volumancer.XXX)
+
+args=(none 0)
+temp=$(mktemp /tmp/XXXXXXX)
+nc -lkU $socket > $temp &
+if [ -z "$(ps -p $! | grep nc)" ]; then
+	echo "Could not start listener. Port in use?"
+	exit 1
+fi
+exec 3< $temp
+rm $temp
+
+while true; do
+	
+	a=$(read <&3 line && echo $line)
+	if [ -n "$a" ]; then
+		a2=($a)
+		if [ "${a2[0]}" == "set" ]; then
+			osascript -e "set volume output volume ${a2[1]}"
+		elif [ "${a2[0]}" == "mute" ]; then
+			osascript -e "set volume with output muted"
+		elif [ "${a2[0]}" == "unmute" ]; then
+			osascript -e "set volume without output muted"
+		else
+			args=($a)
+		fi
+	fi
+	if [ "${args[0]}" == "mutelock" ]; then
+		osascript -e "if not output muted of (get volume settings) then set volume with output muted"
+	elif [ "${args[0]}" == "lock" ]; then
+		osascript -e "if output volume of (get volume settings) is not equal to ${args[1]} then set volume output volume ${args[1]}"
+	elif [ "${args[0]}" == "max" ]; then
+		osascript -e "if output volume of (get volume settings) is greater than ${args[1]} then set volume output volume ${args[1]}"
+	fi
+done

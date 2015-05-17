@@ -1,0 +1,40 @@
+#!/bin/bash
+#volumancer
+VERSION=1.0
+trap 'if [ -n "$(jobs -p)" ]; then kill $(jobs -p); fi' EXIT
+socket=$(find /var/tmp/ -name volumancer.\* -maxdepth 1 | head -n 1)
+if [ -z socket ]; then
+	echo "Could not find socket"
+	exit 1
+fi
+printHelp () {
+	echo -e "volumancer v$VERSION"\
+	"\nAuthor: Logan Dean"\
+	"\nUsage:"\
+	"\n$\tvolumancer <verb>"\
+	"\nwhere <verb> is one of:"\
+	"\n|\tset <level>\t\tSets the volume level to <level>%"\
+	"\n|\tmute\t\t\tMutes output volume"\
+	"\n|\tunmute\t\t\tUnmutes output volume"\
+	"\n|\tmax <level>\t\tSets the maximum volume level to <level>%"\
+	"\n|\tlock <level>\t\tLocks the volume level at <level>%"\
+	"\n|\tmutelock <level>\t\tLocks output volume muted"\
+	"\n|\tunlock\t\t\tUnlocks the volume level/removes the maximum/disables mutelock"\
+	
+	exit 0
+}
+if [ $# == 2 ]; then
+	if [ $1 == set ] || [ $1 = lock ] || [ $1 = max ]; then
+		echo "$1 $2" | nc -U $socket #don't need loops anymore
+	else
+		printHelp
+	fi
+elif [ $# == 1 ]; then
+	if [ $1 == unlock ] || [ $1 == mute ] || [ $1 == unmute ] || [ $1 == mutelock ]; then
+		echo "$1" | nc -U $socket
+	else
+		printHelp
+	fi
+else
+	printHelp
+fi
