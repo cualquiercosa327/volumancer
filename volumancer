@@ -18,8 +18,8 @@ printHelp () {
 	"\n|\tunmute\t\t\tUnmutes output volume"\
 	"\n|\tmax <level>\t\tSets the maximum volume level to <level>%"\
 	"\n|\tlock <level>\t\tLocks the volume level at <level>%"\
-	"\n|\tmutelock <level>\t\tLocks output volume muted"\
-	"\n|\tunlock\t\t\tUnlocks the volume level/removes the maximum/disables mutelock"\
+	"\n|\tmutelock <level>\tLocks output volume muted"\
+	"\n|\tunlock\t\t\tDisable lock/mute lock/maximum"\
 	
 	exit 0
 }
