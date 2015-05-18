@@ -1,5 +1,10 @@
 #!/bin/bash
 
+rm /usr/bin/volumancer
+rm /usr/bin/volumancerd
+rm /Library/LaunchAgents/not.an.imposter.volumancerd.plist
+
+
 curl https://raw.githubusercontent.com/notanimposter/volumancer/master/volumancer > /usr/bin/volumancer
 
 chmod +x /usr/bin/volumancer
@@ -31,8 +36,8 @@ echo "${String}" | tee /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 
 chown root /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 
-launchctl unload /Library/LaunchAgents/not.an.imposter.volumancerd.plist
+sleep 5
+
 launchctl load /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 
-launchctl stop not.an.imposter.volumancerd
 launchctl start not.an.imposter.volumancerd
