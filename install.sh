@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 curl https://raw.githubusercontent.com/notanimposter/volumancer/master/volumancer > /usr/bin/volumancer
 
 chmod +x /usr/bin/volumancer
@@ -10,7 +9,7 @@ chmod +x /usr/bin/volumancerd
 
 touch /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 
-cat /Library/LaunchAgents/not.an.imposter.volumancerd.plist <<- EOM
+read -d '' String <<"EOF"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -27,7 +26,13 @@ cat /Library/LaunchAgents/not.an.imposter.volumancerd.plist <<- EOM
 		<true/>
 	</dict>
 </plist>
-EOM
+EOF
+echo "${String}" | tee /Library/LaunchAgents/not.an.imposter.volumancerd.plist
+
 chown root /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 
+launchctl unload /Library/LaunchAgents/not.an.imposter.volumancerd.plist
 launchctl load /Library/LaunchAgents/not.an.imposter.volumancerd.plist
+
+launchctl stop not.an.imposter.volumancerd
+launchctl start not.an.imposter.volumancerd
